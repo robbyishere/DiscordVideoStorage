@@ -1,0 +1,12 @@
+#Trim Intro
+./ffmpeg -i "./danser_2021-11-27_02-08-54.mp4" -ss 00:00:20 -c copy danser_2021-11-27_02-08-54_Cut.mp4
+
+#Add Video Transition
+./ffmpeg -i "./danser_2021-11-27_02-08-54.mp4" -vf "fade=in:0:60" -crf 14 -c:v libx264 -profile:v high -preset veryslow -c:a copy danser_2021-11-27_02-08-54_CutwithTransition.mp4
+
+#Add Audio Transition
+./ffmpeg -i "./danser_2021-11-27_02-08-54_CutwithTransition.mp4" -af "afade=t=in:ss=0:d=1" -c:v copy -c:a libopus -b:a 192k danser_2021-11-27_02-08-54_CutwithAudioTransition.mp4
+
+#Two Pass VP9 Encode
+./ffmpeg -i "./danser_2021-11-27_02-08-54_CutwithTransition.mp4" -c:v libvpx-vp9 -b:v 750k -minrate 0k -maxrate 750k -pass 1 -deadline good -c:a libopus -b:a 64k -an -f null /dev/null && \
+./ffmpeg -i "./danser_2021-11-27_02-08-54_CutwithTransition.mp4" -c:v libvpx-vp9 -b:v 750k -minrate 0k -maxrate 750k -pass 2 -deadline good-c:a libopus -b:a 64k danser_2021-11-27_02-08-54_CutwithTransition_750k_Good.mp4
